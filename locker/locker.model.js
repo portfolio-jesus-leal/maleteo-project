@@ -25,6 +25,6 @@ const lockerSchema = new mongoose.Schema(
 });
 
 // Name of collection in MongoDB and schema
-const Locker = mongoose.model('Lockers', lockerSchema);
+const Locker = mongoose.model('lockers', lockerSchema);
 
 module.exports = Locker;

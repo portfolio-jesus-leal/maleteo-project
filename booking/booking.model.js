@@ -23,7 +23,7 @@ const bookingSchema = new mongoose.Schema(
 });
 
 // Name of collection in MongoDB and schema
-const Booking = mongoose.model('Bookings', bookingSchema);
+const Booking = mongoose.model('bookings', bookingSchema);
 
 module.exports = Booking;
 

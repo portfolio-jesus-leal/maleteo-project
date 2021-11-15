@@ -1,9 +1,6 @@
 const userRouter = require("express").Router();
 const upload = require('../_shared/middleware/file.middleware');
-// ********** SOLO PARA PRUEBAS *****************
-//const { isAuth } = require('../_shared/middleware/auth.middleware');
-const isAuth = () => { console.log('isAuth')};
-// ********** SOLO PARA PRUEBAS *****************
+const { isAuth } = require('../_shared/middleware/auth.middleware');
 
 const {
     getAllUsers,
@@ -22,21 +19,22 @@ const {
     deleteUserById,
 } = require("./user.controller");
 
+// Routes not securitized by isAuth
 userRouter.post("/login", loginUser);
 userRouter.post("/", upload.single('image'), postNewUser);
 
-//userRouter.get("/", [isAuth], getAllUsers);
+// Routes securitized by isAuth
 userRouter.get("/", getAllUsers);
-userRouter.get("/:id", [isAuth], getUserById);
-userRouter.get("/alias/:alias", [isAuth], getUserByAlias);
-userRouter.put("/:id", [isAuth], upload.single('image'), updateUserById);
-userRouter.post("/logout", [isAuth], logoutUser);
-userRouter.patch("/image/:id", [isAuth], upload.single('image'), updateImageUser);
-userRouter.patch("/status/:id", [isAuth], updateUserStatusById);
-userRouter.patch("/guardian/:id", [isAuth], setUserAsGuardianById);
-userRouter.patch("/search/:id", [isAuth], addSearchUserById);
-userRouter.patch("/booking/:id", [isAuth], addBookingUserById);
-userRouter.patch("/password/:id", [isAuth],updateUserPasswordById);
-userRouter.delete("/:id", [isAuth], deleteUserById);
+userRouter.get("/:id", getUserById);
+userRouter.get("/alias/:alias", getUserByAlias);
+userRouter.put("/:id", upload.single('image'), updateUserById);
+userRouter.post("/logout", logoutUser);
+userRouter.patch("/image/:id", upload.single('image'), updateImageUser);
+userRouter.patch("/status/:id", updateUserStatusById);
+userRouter.patch("/guardian/:id", setUserAsGuardianById);
+userRouter.patch("/search/:id", addSearchUserById);
+userRouter.patch("/booking/:id", addBookingUserById);
+userRouter.patch("/password/:id",updateUserPasswordById);
+userRouter.delete("/:id", deleteUserById);
 
 module.exports = userRouter;

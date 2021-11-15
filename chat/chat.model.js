@@ -16,7 +16,7 @@ const chatSchema = new mongoose.Schema(
 });
 
 // Name of collection in MongoDB and schema
-const Chat = mongoose.model('Chats', chatSchema);
+const Chat = mongoose.model('chats', chatSchema);
 
 module.exports = Chat;
 

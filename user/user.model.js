@@ -54,7 +54,7 @@ userSchema.pre('findOneAndUpdate', function (next) {
 
 
 // Name of collection in MongoDB and schema
-const User = mongoose.model('Users', userSchema);
+const User = mongoose.model('users', userSchema);
 
 module.exports = User;
 

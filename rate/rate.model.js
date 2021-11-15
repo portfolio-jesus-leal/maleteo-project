@@ -15,6 +15,6 @@ const rateSchema = new mongoose.Schema(
 });
 
 // Name of collection in MongoDB and schema
-const Rate = mongoose.model('Rates', rateSchema);
+const Rate = mongoose.model('rates', rateSchema);
 
 module.exports = Rate;
