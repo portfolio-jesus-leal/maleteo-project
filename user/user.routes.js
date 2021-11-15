@@ -19,11 +19,11 @@ const {
     deleteUserById,
 } = require("./user.controller");
 
-// Routes not securitized by isAuth
+// Routes NOT secured by isAuth
 userRouter.post("/login", loginUser);
 userRouter.post("/", upload.single('image'), postNewUser);
 
-// Routes securitized by isAuth
+// Routes secured by isAuth
 userRouter.get("/", getAllUsers);
 userRouter.get("/:id", getUserById);
 userRouter.get("/alias/:alias", getUserByAlias);

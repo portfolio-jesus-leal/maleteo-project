@@ -1,5 +1,6 @@
 const User = require("./user.model");
 const BookingResolver = require("../booking/booking.resolver");
+const { setError } = require("../_shared/utils/error/error.utils");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -79,17 +80,17 @@ const postNewUser = async (req, res, next) => {
       address: address,
       gender: gender.toLowerCase(),
       img_profile: img_profile,
-      guardian: guardian,
+      guardian: false,
       password: password,
       bookings: bookings,
       searchs: searchs,
-      active: active,
+      active: true,
     });
     password = null;
     req.body.password = null;
 
-    const userInBD = await newUser.save();
-    return res.status(201).json({ userInBD });
+    const userInDB = await newUser.save();
+    return res.status(201).json({ userInDB });
   } catch (error) {
     next(error);
   }
@@ -101,43 +102,37 @@ const postNewUser = async (req, res, next) => {
 const loginUser = async (req, res, next) => {
   try {
     if (req.body.alias) {
-      const userInBD = await User.findOne({ alias: req.body.alias });
-      console.log("Usuario encontrado ->", userInBD);
+      const userInDB = await User.findOne({ alias: req.body.alias });
+      console.log("Usuario encontrado ->", userInDB);
     } else {
       if (req.body.email) {
-        const userInBD = await User.findOne({ email: req.body.email });
-        console.log("Usuario encontrado ->", userInBD);
+        const userInDB = await User.findOne({ email: req.body.email });
+        console.log("Usuario encontrado ->", userInDB);
       }
     }
 
-    if (!userInBD) {
-      const error = new Error();
-      error.message = "Alias does not exist";
-      error.status = 404;
-      return next(error);
+    if (!userInDB) {
+      return next(setError(404, "Alias does not exist"));
     }
 
     const isValidPassword = bcrypt.compareSync(
       req.body.password,
-      userInBD.password
+      userInDB.password
     );
-    userInBD.password = null;
+    userInDB.password = null;
     req.body.password = null;
 
     if (!isValidPassword) {
-      const error = new Error();
-      error.message = "Invalid credentials";
-      error.status = 403;
-      return next(error);
+      return next(setError(403, "Invalid credentials"));
     }
 
     console.log("Contraseña correcta");
     const token = jwt.sign(
-      { id: userInBD._id, alias: userInBD.alias },
+      { id: userInDB._id, alias: userInDB.alias },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
-    return res.status(201).json(token);
+    return res.status(201).json({ token, userInDB });
   } catch (error) {
     next(error);
   }
@@ -245,10 +240,7 @@ const updateImageUser = async (req, res, next) => {
         updatedUser.password = null;
         return res.status(200).json(updatedUser);
       } else {
-        const error = new Error();
-        error.message="The image name is not valid";
-        error.status=400;
-        return next(error);
+        return next(setError(400, "The image name is not valid"));
       }
   
     } catch (error) {
@@ -282,10 +274,7 @@ const addSearchUserById = async (req, res, next) => {
     const { id } = req.params;
 
     if (!req.body.search) {
-      const error = new Error();
-      error.message = "Field search is required";
-      error.status = 400;
-      return next(error);
+      return next(setError(400, "Field search is required"));
     }
 
     const updateUser = await User.findByIdAndUpdate(id, {
@@ -308,10 +297,7 @@ const addBookingUserById = async (req, res, next) => {
     const { id } = req.params;
 
     if (!req.body.booking) {
-      const error = new Error();
-      error.message = "Field booking is required";
-      error.status = 400;
-      return next(error);
+      return next(setError(400, "Field booking is required"));
     } else {
       BookingResolver.findBookingById(req.body.booking);
     }
@@ -338,15 +324,12 @@ const deleteUserById = async (req, res, next) => {
     const user = await User.findById(id);
     
     if (BookingResolver.hasBookingActive(id)) {
-      const error = new Error();
-      error.message = "The user has actived bookings";
-      error.status = 400;
-      return next(error);
+      return next(setError(400, "The user has actived bookings"));
     }
 
     const updateUser = await User.findByIdAndUpdate(id, {
       email: null,
-      name: null,
+      name: 'User canceled',
       last_name: null,
       birthday: null,
       address: null,

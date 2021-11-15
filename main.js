@@ -5,6 +5,7 @@ const { defaults } = require('./_shared/utils/utils.utils');
 const cloudinary = require("cloudinary").v2;
 // Main routes
 const usersRoutes = require('./user/user.routes');
+const ratesRoutes = require('./rate/rate.routes');
 // Middleweare logging
 const logging = require('./_shared/middleware/logging.middleware');
 
@@ -27,6 +28,7 @@ app.use(logging);
 
 // Routes
 app.use('/users', usersRoutes);
+app.use('/rates', ratesRoutes);
 
 app.use('*', (req, res, next) => {
     const error = new Error();
