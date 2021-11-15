@@ -4,7 +4,7 @@ const { validationPassword } = require("../_shared/utils/validations.utils");
 
 const userSchema = new mongoose.Schema(
 {
-    alias: { type:String, required:true, trim:true, unique:true },
+    alias: { type:String, required:true, trim:true, unique:true, lowercase: true },
     email: { type:String, required:true, trim:true, unique:true },
     name: { type:String, required:true, trim:true },
     last_name: { type:String, required:true, trim:true },
@@ -30,9 +30,9 @@ userSchema.pre('save', function (next) {
         const error = new Error();
         error.message = "Invalid password";
         error.status = 400
+    } else {
+        this.password = bcrypt.hashSync(this.password, 10);
     }
-
-    this.password = bcrypt.hashSync(this.password, 10);
     next();
 });
 
@@ -45,10 +45,10 @@ userSchema.pre('findOneAndUpdate', function (next) {
             const error = new Error();
             error.message = "Invalid password";
             error.status = 400
+        } else {
+            this._update.password = bcrypt.hashSync(this._update.password, 10);
         }
-        this._update.password = bcrypt.hashSync(this._update.password, 10);
     }
-
     next();
 });
 

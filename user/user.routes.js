@@ -1,5 +1,9 @@
 const userRouter = require("express").Router();
 const upload = require('../_shared/middleware/file.middleware');
+// ********** SOLO PARA PRUEBAS *****************
+//const { isAuth } = require('../_shared/middleware/auth.middleware');
+const isAuth = () => { console.log('isAuth')};
+// ********** SOLO PARA PRUEBAS *****************
 
 const {
     getAllUsers,
@@ -21,7 +25,8 @@ const {
 userRouter.post("/login", loginUser);
 userRouter.post("/", upload.single('image'), postNewUser);
 
-userRouter.get("/", [isAuth], getAllUsers);
+//userRouter.get("/", [isAuth], getAllUsers);
+userRouter.get("/", getAllUsers);
 userRouter.get("/:id", [isAuth], getUserById);
 userRouter.get("/alias/:alias", [isAuth], getUserByAlias);
 userRouter.put("/:id", [isAuth], upload.single('image'), updateUserById);

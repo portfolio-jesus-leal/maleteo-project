@@ -3,6 +3,8 @@ const { connectWithDB } = require('./_shared/utils/db/db');
 const { isAuth } = require('./_shared/middleware/auth.middleware');
 const { defaults } = require('./_shared/utils/utils.utils');
 const cloudinary = require("cloudinary").v2;
+// Main routes
+const usersRoutes = require('./user/user.routes');
 // Middleweare logging
 const logging = require('./_shared/middleware/logging.middleware');
 
@@ -19,9 +21,8 @@ const app = express();
 
 connectWithDB();
 
-app.use(express.limit('5mb'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ limit: '5mb', extended: true }));
 app.use(logging);
 
 // Routes

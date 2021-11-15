@@ -7,6 +7,8 @@ const jwt = require("jsonwebtoken");
 // GET all users
 //
 const getAllUsers = async (req, res, next) => {
+  console.log('getAllUsers');
+
   try {
     const users = await User.find();
     return res.status(200).json({ users });
@@ -189,7 +191,7 @@ const updateUserById = async (req, res, next) => {
       bookings: bookings,
       searchs: searchs,
       active: active,
-    });
+    }, {returnDocument: 'after'});
     updateUser.password = null;
 
     return res.status(200).json(updateUser);
@@ -334,14 +336,13 @@ const deleteUserById = async (req, res, next) => {
     const { id } = req.params;
 
     const user = await User.findById(id);
-
-        if (BookingResolver.hasBookingActive(booking)) {
-          const error = new Error();
-          error.message = "The user has actived bookings";
-          error.status = 400;
-          return next(error);
-        }
-
+    
+    if (BookingResolver.hasBookingActive(id)) {
+      const error = new Error();
+      error.message = "The user has actived bookings";
+      error.status = 400;
+      return next(error);
+    }
 
     const updateUser = await User.findByIdAndUpdate(id, {
       email: null,
