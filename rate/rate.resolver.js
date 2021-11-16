@@ -9,6 +9,14 @@ class RateResolver {
       throw error;
     }
   }
+
+  static async findRateByLocation(location) {
+    try {
+      return await Rate.findOne({ location: location, active: true });
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = RateResolver;

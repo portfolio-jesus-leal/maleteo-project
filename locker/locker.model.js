@@ -4,6 +4,7 @@ const lockerSchema = new mongoose.Schema(
 {
     guardian: { type:mongoose.Types.ObjectId, ref: 'Users', required:true, trim:true },
     description: { type:String, required:true },
+    type: { type:String, required:true },
     location: { type:String, required:true },
     address: { type:String, required:true },
     latitude: { type:Number, required:true },
