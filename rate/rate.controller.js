@@ -1,4 +1,58 @@
 const Rate = require("./rate.model");
+const { setError } = require("../_shared/utils/error/error.utils");
+
+//
+// Calculate final price for a booking
+//
+const calculatePrice = async (req, res, next) => {
+  console.log("calculatePrice");
+
+  try {
+    const { location, init_date, end_date, pieces } = req.body;
+
+    // Check input values
+    if (!location || !init_date || !end_date || !pieces) {
+      return next(setError(400, "Invalid parameters"));
+    }
+
+    // Parse dates
+    const initDate = Date.parse(init_date);
+    const endDate = Date.parse(end_date);
+
+    // Check if dates are not valid
+    if (isNaN(initDate) || isNaN(endDate)) {
+      return next(setError(400, "Dates are not valid"));
+    }
+
+    // Calculate number of days
+    const days = Math.ceil((endDate - initDate) / (1000 * 60 * 60 * 24));
+
+    // Find a rate
+    rateDetails = await Rate.findOne({ location: location, active: true });
+
+    if (!rateDetails) {
+      return next(setError(400, "Rate not found"));
+    }
+
+    // Calculate prices
+    const grossPrice =
+      (rateDetails.price + ((days - 1) * rateDetails.price_extra)) * pieces;
+    const taxes = (grossPrice * rateDetails.tax_pct) / 100;
+    const totalPrice = grossPrice + taxes + rateDetails.fee;
+
+    return res.status(200).json({
+      pieces: pieces,
+      days: days,
+      gross_price: grossPrice,
+      taxes: taxes,
+      fee: rateDetails.fee,
+      total_price: totalPrice
+    });
+
+  } catch (error) {
+    return next(error);
+  }
+};
 
 //
 // GET all rates
@@ -18,16 +72,16 @@ const getAllRates = async (req, res, next) => {
 // GET rate by Id
 //
 const getRateById = async (req, res, next) => {
-    console.log("getRateById");
+  console.log("getRateById");
 
-    try {
-        const { id } = req.params;
-        const rate = await Rate.findById(id);
-        return res.status(200).json({ rate });
-    } catch (error) {
-        next(error);
-    }
-}
+  try {
+    const { id } = req.params;
+    const rate = await Rate.findById(id);
+    return res.status(200).json({ rate });
+  } catch (error) {
+    next(error);
+  }
+};
 
 //
 // GET all locations
@@ -166,6 +220,7 @@ const deleteRateById = async (req, res, next) => {
 module.exports = {
   getAllRates,
   getRateById,
+  calculatePrice,
   getAllLocations,
   postNewRate,
   updateRateById,

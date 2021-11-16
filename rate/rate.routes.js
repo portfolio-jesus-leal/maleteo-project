@@ -3,6 +3,7 @@ const rateRouter = require("express").Router();
 const {
     getAllRates,
     getRateById,
+    calculatePrice,
     getAllLocations,
     postNewRate,
     updateRateById,
@@ -10,9 +11,10 @@ const {
     deleteRateById,
 } = require("./rate.controller");
 
+rateRouter.get("/locations", getAllLocations);
+rateRouter.get("/calculateprice", calculatePrice);
 rateRouter.get("/", getAllRates);
 rateRouter.get("/:id", getRateById);
-rateRouter.get("/locations", getAllLocations);
 rateRouter.post("/", postNewRate);
 rateRouter.put("/:id", updateRateById);
 rateRouter.patch("/status/:id", updateRateStatusById);
