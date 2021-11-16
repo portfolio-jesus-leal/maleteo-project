@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const lockerSchema = new mongoose.Schema(
 {
-    guardian: { type:String, ref: 'Users', required:true, trim:true },
+    guardian: { type:mongoose.Types.ObjectId, ref: 'Users', required:true, trim:true },
     description: { type:String, required:true },
     location: { type:String, required:true },
     address: { type:String, required:true },
@@ -10,7 +10,7 @@ const lockerSchema = new mongoose.Schema(
     longitude: { type:Number, required:true },
     available: [{ 
         available_from: { type:Date, default:Date.now },
-        available_to: { type:Date, default:ISODate("9999-12-31")},
+        available_to: { type:Date, default:new Date('2999-12-31T00:00:00Z')},
     }],
     pieces_max: { type:Number, required:true, default:1 },
     tags: [{ type:String }],
