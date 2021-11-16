@@ -1,4 +1,5 @@
 const Rate = require("./rate.model");
+const RateResolver = require("./rate.resolver");
 const { setError } = require("../_shared/utils/error/error.utils");
 
 //
@@ -10,6 +11,18 @@ const calculatePrice = async (req, res, next) => {
   try {
     const { location, init_date, end_date, pieces } = req.body;
 
+    result = await RateResolver.calculatePrice(location, init_date, end_date, pieces);
+
+    return res.status(200).json({
+      pieces: pieces,
+      days: result.days,
+      gross_price: result.gross_price,
+      taxes: result.taxes,
+      fee: result.fee,
+      total_price: result.total_price
+    });
+
+    /*
     // Check input values
     if (!location || !init_date || !end_date || !pieces) {
       return next(setError(400, "Invalid parameters"));
@@ -47,7 +60,7 @@ const calculatePrice = async (req, res, next) => {
       taxes: taxes,
       fee: rateDetails.fee,
       total_price: totalPrice
-    });
+    }); */
 
   } catch (error) {
     return next(error);

@@ -1,6 +1,7 @@
 const Locker = require("./locker.model");
 const UserResolver = require("../user/user.resolver");
 const RateResolver = require("../rate/rate.resolver");
+const LockerResolver = require("./locker.resolver");
 const { setError } = require("../_shared/utils/error/error.utils");
 
 //
@@ -256,7 +257,15 @@ const checkAvailabilityLockerById = async (req, res, next) => {
     const { id } = req.params;
     const { init_date, end_date } = req.body;
 
-    // Parse dates
+    const isAvailable = await LockerResolver.checkAvailabilityLocker(id, init_date, end_date);
+
+    if (isAvailable) {
+      return res.status(200).json({available:true});
+    } else {
+      return res.status(200).json({available:false});
+    }
+
+    /* // Parse dates
     const initDate = Date.parse(init_date);
     const endDate = Date.parse(end_date);
 
@@ -264,7 +273,7 @@ const checkAvailabilityLockerById = async (req, res, next) => {
     if (isNaN(initDate) || isNaN(endDate)) {
        return next(setError(400, "Dates are not valid"));
     }
-    
+
     const lockerDetails = await Locker.findById( id );
     if (!lockerDetails) {
       return next(setError(400, "Locker not found"));
@@ -281,7 +290,7 @@ const checkAvailabilityLockerById = async (req, res, next) => {
         return res.status(200).json({available:true});
       }
     } 
-    return res.status(200).json({available:false});
+    return res.status(200).json({available:false}); */
     
   } catch (error) {
     return next(error);
