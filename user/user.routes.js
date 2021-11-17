@@ -5,7 +5,6 @@ const { isAuth } = require('../_shared/middleware/auth.middleware');
 const {
     getAllUsers,
     getUserById,
-    getUserByAlias,
     postNewUser,
     loginUser,
     logoutUser,
@@ -26,7 +25,6 @@ userRouter.post("/", upload.single('image'), postNewUser);
 // Routes secured by isAuth
 userRouter.get("/", getAllUsers);
 userRouter.get("/:id", getUserById);
-userRouter.get("/alias/:alias", getUserByAlias);
 userRouter.put("/:id", upload.single('image'), updateUserById);
 userRouter.post("/logout", logoutUser);
 userRouter.patch("/image/:id", upload.single('image'), updateImageUser);

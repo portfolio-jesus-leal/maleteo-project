@@ -35,43 +35,24 @@ const getUserById = async (req, res) => {
 };
 
 //
-// GET a user by alias
-//
-const getUserByAlias = async (req, res) => {
-  try {
-    const { alias } = req.params;
-    const user = await User.find({ alias });
-
-    user.password = "";
-
-    return res.status(200).json(user);
-  } catch (error) {
-    return next(error);
-  }
-};
-
-//
 // POST - Create a new user
 //
 const postNewUser = async (req, res, next) => {
-  const {
-    alias,
-    email,
-    name,
-    last_name,
-    birthday,
-    address,
-    gender,
-    img_profile,
-    guardian,
-    searchs,
-    marketing,
-  } = req.body;
-  let password = req.body.password;
-
   try {
+
+    const {
+      email,
+      name,
+      last_name,
+      birthday,
+      address,
+      gender,
+      img_profile,
+      marketing,
+    } = req.body;
+    let password = req.body.password;
+
     const newUser = new User({
-      alias: alias.toLowerCase(),
       email: email,
       name: name,
       last_name: last_name,
@@ -79,9 +60,8 @@ const postNewUser = async (req, res, next) => {
       address: address,
       gender: gender.toLowerCase(),
       img_profile: img_profile,
-      guardian: false,
       password: password,
-      searchs: searchs,
+      guardian: false,
       active: true,
       marketing: marketing,
     });
@@ -89,6 +69,8 @@ const postNewUser = async (req, res, next) => {
     req.body.password = null;
 
     const userInDB = await newUser.save();
+    //userInDB.password = null;
+
     return res.status(201).json({ userInDB });
   } catch (error) {
     next(error);
@@ -100,18 +82,14 @@ const postNewUser = async (req, res, next) => {
 //
 const loginUser = async (req, res, next) => {
   try {
-    if (req.body.alias) {
-      const userInDB = await User.findOne({ alias: req.body.alias });
+
+    if (req.body.email) {
+      const userInDB = await User.findOne({ email: req.body.email });
       console.log("Usuario encontrado ->", userInDB);
-    } else {
-      if (req.body.email) {
-        const userInDB = await User.findOne({ email: req.body.email });
-        console.log("Usuario encontrado ->", userInDB);
-      }
     }
 
     if (!userInDB) {
-      return next(setError(404, "Alias does not exist"));
+      return next(setError(404, "Email does not exist"));
     }
 
     const isValidPassword = bcrypt.compareSync(
@@ -127,7 +105,7 @@ const loginUser = async (req, res, next) => {
 
     console.log("Contraseña correcta");
     const token = jwt.sign(
-      { id: userInDB._id, alias: userInDB.alias },
+      { id: userInDB._id, email: userInDB.email },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -156,7 +134,6 @@ const updateUserById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const {
-      alias,
       email,
       name,
       last_name,
@@ -168,7 +145,6 @@ const updateUserById = async (req, res, next) => {
     } = req.body;
    
     const updateUser = await User.findByIdAndUpdate(id, {
-      alias: alias.toLowerCase(),
       email: email,
       name: name,
       last_name: last_name,
@@ -349,7 +325,6 @@ const deleteUserById = async (req, res, next) => {
 module.exports = {
   getAllUsers,
   getUserById,
-  getUserByAlias,
   postNewUser,
   loginUser,
   logoutUser,
