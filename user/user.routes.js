@@ -10,12 +10,12 @@ const {
     loginUser,
     logoutUser,
     updateUserById,
-    updateUserStatusById,
+    setUserStatusById,
     updateUserPasswordById,
     updateImageUser,
     setUserAsGuardianById,
     addSearchUserById,
-    addBookingUserById,
+    setMarketingUserById,
     deleteUserById,
 } = require("./user.controller");
 
@@ -30,10 +30,10 @@ userRouter.get("/alias/:alias", getUserByAlias);
 userRouter.put("/:id", upload.single('image'), updateUserById);
 userRouter.post("/logout", logoutUser);
 userRouter.patch("/image/:id", upload.single('image'), updateImageUser);
-userRouter.patch("/status/:id", updateUserStatusById);
+userRouter.patch("/status/:id", setUserStatusById);
 userRouter.patch("/guardian/:id", setUserAsGuardianById);
 userRouter.patch("/search/:id", addSearchUserById);
-userRouter.patch("/booking/:id", addBookingUserById);
+userRouter.patch("/marketing/:id", setMarketingUserById);
 userRouter.patch("/password/:id",updateUserPasswordById);
 userRouter.delete("/:id", deleteUserById);
 

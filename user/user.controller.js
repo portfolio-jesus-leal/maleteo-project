@@ -64,11 +64,10 @@ const postNewUser = async (req, res, next) => {
     gender,
     img_profile,
     guardian,
-    password,
-    bookings,
     searchs,
-    active,
+    marketing,
   } = req.body;
+  let password = req.body.password;
 
   try {
     const newUser = new User({
@@ -82,9 +81,9 @@ const postNewUser = async (req, res, next) => {
       img_profile: img_profile,
       guardian: false,
       password: password,
-      bookings: bookings,
       searchs: searchs,
       active: true,
+      marketing: marketing,
     });
     password = null;
     req.body.password = null;
@@ -119,8 +118,8 @@ const loginUser = async (req, res, next) => {
       req.body.password,
       userInDB.password
     );
-    userInDB.password = null;
     req.body.password = null;
+    userInDB.password = null;
 
     if (!isValidPassword) {
       return next(setError(403, "Invalid credentials"));
@@ -165,13 +164,9 @@ const updateUserById = async (req, res, next) => {
       address,
       gender,
       img_profile,
-      guardian,
-      password,
-      bookings,
-      searchs,
-      active,
+      marketing,
     } = req.body;
-
+   
     const updateUser = await User.findByIdAndUpdate(id, {
       alias: alias.toLowerCase(),
       email: email,
@@ -181,14 +176,10 @@ const updateUserById = async (req, res, next) => {
       address: address,
       gender: gender.toLowerCase(),
       img_profile: img_profile,
-      guardian: guardian,
-      password: password,
-      bookings: bookings,
-      searchs: searchs,
-      active: active,
+      marketing: marketing,
     }, {returnDocument: 'after'});
     updateUser.password = null;
-
+   
     return res.status(200).json(updateUser);
   } catch (error) {
     return next(error);
@@ -203,6 +194,7 @@ const updateUserPasswordById = async (req, res, next) => {
     const { id } = req.params;
 
     await User.findByIdAndUpdate(id, { password: req.body.password });
+    req.body.password = null;
     return res.status(204).json();
   } catch (error) {
     return next(error);
@@ -210,11 +202,17 @@ const updateUserPasswordById = async (req, res, next) => {
 };
 
 //
-// PATH Update status by id
+// PATH Set user status by id
 //
-const updateUserStatusById = async (req, res, next) => {
+const setUserStatusById = async (req, res, next) => {
   try {
     const { id } = req.params;
+
+    console.log('Tipo->', typeof req.body.active);
+
+    if (typeof req.body.active !== 'boolean') {
+      return next(setError(400, "Field active is required"));
+    }
 
     const updateUser = await User.findByIdAndUpdate(id, {
       active: req.body.active,
@@ -255,6 +253,10 @@ const setUserAsGuardianById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
+    if (typeof req.body.guardian !== 'boolean') {
+      return next(setError(400, "Field guardian is required"));
+    }
+
     const updateUser = await User.findByIdAndUpdate(id, {
       guardian: req.body.guardian,
     });
@@ -290,22 +292,19 @@ const addSearchUserById = async (req, res, next) => {
 };
 
 //
-// PATH Add a booking to user (by Id)
+// PATH Set marketing indicator of a user (by Id)
 //
-const addBookingUserById = async (req, res, next) => {
+const setMarketingUserById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    if (!req.body.booking) {
-      return next(setError(400, "Field booking is required"));
-    } else {
-      BookingResolver.findBookingById(req.body.booking);
+    if (typeof req.body.marketing !== 'boolean') {
+      return next(setError(400, "Field marketing is required"));
     }
 
-    const updateUser = await User.findByIdAndUpdate(id, {
-      $push: { bookings: req.body.booking },
+    const updateUser = await User.findByIdAndUpdate(id, { 
+      marketing: req.body.marketing 
     });
-
     updateUser.password = null;
 
     return res.status(200).json(updateUser);
@@ -355,11 +354,11 @@ module.exports = {
   loginUser,
   logoutUser,
   updateUserById,
-  updateUserStatusById,
+  setUserStatusById,
   updateUserPasswordById,
   updateImageUser,
   setUserAsGuardianById,
   addSearchUserById,
-  addBookingUserById,
+  setMarketingUserById,
   deleteUserById,
 };

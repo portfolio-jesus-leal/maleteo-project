@@ -14,9 +14,9 @@ const userSchema = new mongoose.Schema(
     img_profile: { type:String },
     guardian: { type:Boolean, default:false },
     password: { type:String, required:true, trim:true },
-    bookings: [{type: mongoose.Types.ObjectId, ref: 'Bookings'}],
     searchs: [ { type:String } ],
-    active: { type:Boolean, required:true, default:true }
+    active: { type:Boolean, required:true, default:true },
+    marketing: { type:Boolean, default:false },
 },
 {
     timestamps: true
