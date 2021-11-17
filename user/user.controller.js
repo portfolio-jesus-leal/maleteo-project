@@ -83,13 +83,15 @@ const postNewUser = async (req, res, next) => {
 const loginUser = async (req, res, next) => {
   try {
 
-    if (req.body.email) {
-      const userInDB = await User.findOne({ email: req.body.email });
-      console.log("Usuario encontrado ->", userInDB);
+    if (!req.body.email) {
+      return next(setError(400, "email is missing"));
     }
+    
+    const userInDB = await User.findOne({ email: req.body.email });
+    console.log("Usuario encontrado ->", userInDB);
 
     if (!userInDB) {
-      return next(setError(404, "Email does not exist"));
+      return next(setError(404, "email does not exist"));
     }
 
     const isValidPassword = bcrypt.compareSync(
@@ -109,7 +111,7 @@ const loginUser = async (req, res, next) => {
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
-    return res.status(201).json({ token, userInDB });
+    return res.status(201).json({ token: token, user: userInDB });
   } catch (error) {
     next(error);
   }

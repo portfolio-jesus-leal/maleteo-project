@@ -1,6 +1,6 @@
-const setError = (code, message) => {
+const setError = (status, message) => {
     const error = new Error();
-    error.code = code;
+    error.status = status;
     error.message = message;
     return error;
 }
