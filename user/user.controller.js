@@ -45,9 +45,6 @@ const postNewUser = async (req, res, next) => {
       name,
       last_name,
       birthday,
-      address,
-      gender,
-      img_profile,
       marketing,
     } = req.body;
     let password = req.body.password;
@@ -57,9 +54,6 @@ const postNewUser = async (req, res, next) => {
       name: name,
       last_name: last_name,
       birthday: birthday,
-      address: address,
-      gender: gender.toLowerCase(),
-      img_profile: img_profile,
       password: password,
       guardian: false,
       active: true,
@@ -111,7 +105,18 @@ const loginUser = async (req, res, next) => {
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
-    return res.status(201).json({ token: token, user: userInDB });
+
+    const userDetails = {
+      id: userInDB._id,
+      name: userInDB.name,
+      last_name: userInDB.last_name,
+      img_profile: userInDB.img_profile,
+      guardian: userInDB.guardian,
+      active: userInDB.active,
+      searchs: userInDB.searchs
+    }
+
+    return res.status(201).json({ token: token, user: userDetails });
   } catch (error) {
     next(error);
   }
@@ -186,8 +191,6 @@ const setUserStatusById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    console.log('Tipo->', typeof req.body.active);
-
     if (typeof req.body.active !== 'boolean') {
       return next(setError(400, "Field active is required"));
     }
@@ -195,6 +198,28 @@ const setUserStatusById = async (req, res, next) => {
     const updateUser = await User.findByIdAndUpdate(id, {
       active: req.body.active,
     });
+    updateUser.password = null;
+
+    return res.status(200).json(updateUser);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+//
+// PATH Update address user by id
+//
+const updateUserAddressById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!req.body.address) {
+      return next(setError(400, "Field address is required"));
+    }
+
+    const updateUser = await User.findByIdAndUpdate(id, {
+      address: req.body.address,
+    }, {returnDocument: 'after'});
     updateUser.password = null;
 
     return res.status(200).json(updateUser);
@@ -334,6 +359,7 @@ module.exports = {
   setUserStatusById,
   updateUserPasswordById,
   updateImageUser,
+  updateUserAddressById,
   setUserAsGuardianById,
   addSearchUserById,
   setMarketingUserById,

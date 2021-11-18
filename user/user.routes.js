@@ -12,6 +12,7 @@ const {
     setUserStatusById,
     updateUserPasswordById,
     updateImageUser,
+    updateUserAddressById,
     setUserAsGuardianById,
     addSearchUserById,
     setMarketingUserById,
@@ -28,6 +29,7 @@ userRouter.get("/:id", getUserById);
 userRouter.put("/:id", upload.single('image'), updateUserById);
 userRouter.post("/logout", logoutUser);
 userRouter.patch("/image/:id", upload.single('image'), updateImageUser);
+userRouter.patch("/address/:id", updateUserAddressById);
 userRouter.patch("/status/:id", setUserStatusById);
 userRouter.patch("/guardian/:id", setUserAsGuardianById);
 userRouter.patch("/search/:id", addSearchUserById);
