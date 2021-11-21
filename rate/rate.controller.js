@@ -90,6 +90,9 @@ const getAllLocations = async (req, res, next) => {
   }
 };
 
+//
+// GET the location that corresponds to certain coordinates
+//
 const getLocationByCoordinates = async (req, res, next) => {
   try {
     const { longitude, latitude } = req.body;

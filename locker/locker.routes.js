@@ -1,4 +1,5 @@
 const lockerRouter = require("express").Router();
+const upload = require("../_shared/middleware/file.middleware");
 
 const {
     getAllLockers,
@@ -19,9 +20,9 @@ lockerRouter.get("/guardian/:guardian", getLockersByGuardian);
 lockerRouter.get("/location/:location", getLockersByLocation);
 lockerRouter.get("/", getAllLockers);
 lockerRouter.get("/:id", getLockerById);
-lockerRouter.post("/", postNewLocker);
-lockerRouter.put("/:id", updateLockerById);
+lockerRouter.post("/", upload.single('image'), postNewLocker);
+lockerRouter.put("/:id", upload.single('image'), updateLockerById);
+lockerRouter.patch("/addimage/:id", upload.single('image'), addImageLockerById);
 lockerRouter.patch("/status/:id", updateLockerStatusById);
-lockerRouter.patch("/addimage/:id", addImageLockerById);
 
 module.exports = lockerRouter;

@@ -73,10 +73,10 @@ const postNewLocker = async (req, res, next) => {
       address,
       latitude,
       longitude,
-      available,
+      available_from,
+      available_to,
       pieces_max,
       tags,
-      images,
     } = req.body;
 
     if (!guardian || !UserResolver.findUserById(guardian)) {
@@ -96,10 +96,10 @@ const postNewLocker = async (req, res, next) => {
       address,
       latitude,
       longitude,
-      available,
+      available: [{available_from: available_from, available_to: available_to}],
       pieces_max,
       tags,
-      images,
+      images: [req.file ? req.file.path : null],
     });
 
     const lockerInDB = await newLocker.save();
@@ -124,11 +124,12 @@ const updateLockerById = async (req, res, next) => {
       address,
       latitude,
       longitude,
-      available,
+      available_from,
+      available_to,
       pieces_max,
       tags,
-      images,
     } = req.body;
+    const image = req.file ? req.file.path : null;
 
     if (!guardian || !UserResolver.findUserById(guardian)) {
         next(setError(400, "Guardian not found"));
@@ -149,10 +150,10 @@ const updateLockerById = async (req, res, next) => {
         address,
         latitude,
         longitude,
-        available,
+        available: [{available_from: available_from, available_to: available_to}],
         pieces_max,
         tags,
-        images,
+        images: [image],
       },
       { returnDocument: "after" }
     );
@@ -193,7 +194,7 @@ const addImageLockerById = async (req, res, next) => {
         console.log('addImageLockerById');
 
         const { id } = req.params;
-        const { image } = req.body;
+        const image = req.file ? req.file.path : null
     
         console.log("image->", image);
 
