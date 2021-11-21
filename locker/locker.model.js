@@ -4,7 +4,8 @@ const lockerSchema = new mongoose.Schema(
 {
     guardian: { type:mongoose.Types.ObjectId, ref: 'Users', required:true, trim:true },
     description: { type:String, required:true },
-    type: { type:String, required:true },
+    property_type: { type:String, required:true },
+    space_type: { type:String, required:true },
     location: { type:String, required:true },
     address: { type:String, required:true },
     latitude: { type:Number, required:true },
@@ -15,10 +16,7 @@ const lockerSchema = new mongoose.Schema(
     }],
     pieces_max: { type:Number, required:true, default:1 },
     tags: [{ type:String }],
-    images: [{ 
-        img_url: { type:String },
-        img_description: { type:String },
-    }],
+    images: [{ type:String }],
     active: { type:Boolean, default:true}
 },
 {

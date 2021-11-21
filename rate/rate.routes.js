@@ -4,7 +4,9 @@ const {
     getAllRates,
     getRateById,
     calculatePrice,
+    getLocationByCoordinates,
     getAllLocations,
+    getLocationDetails,
     postNewRate,
     updateRateById,
     updateRateStatusById,
@@ -12,7 +14,9 @@ const {
 } = require("./rate.controller");
 
 rateRouter.get("/locations", getAllLocations);
+rateRouter.get("/location/:location", getLocationDetails);
 rateRouter.get("/calculateprice", calculatePrice);
+rateRouter.get("/coordinates", getLocationByCoordinates);
 rateRouter.get("/", getAllRates);
 rateRouter.get("/:id", getRateById);
 rateRouter.post("/", postNewRate);

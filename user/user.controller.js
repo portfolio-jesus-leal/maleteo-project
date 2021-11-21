@@ -113,7 +113,7 @@ const loginUser = async (req, res, next) => {
       img_profile: userInDB.img_profile,
       guardian: userInDB.guardian,
       active: userInDB.active,
-      searchs: userInDB.searchs
+      searches: userInDB.searches
     }
 
     return res.status(201).json({ token: token, user: userDetails });
@@ -283,7 +283,7 @@ const addSearchUserById = async (req, res, next) => {
     }
 
     const updateUser = await User.findByIdAndUpdate(id, {
-      $push: { searchs: req.body.search },
+      $push: { searches: req.body.search },
     });
 
     updateUser.password = null;

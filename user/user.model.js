@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema(
     img_profile: { type:String },
     guardian: { type:Boolean, default:false },
     password: { type:String, required:true, trim:true },
-    searchs: [ { type:String } ],
+    searches: [ { type:String } ],
     active: { type:Boolean, default:true },
     marketing: { type:Boolean, default:false },
 },

@@ -4,6 +4,11 @@ const rateSchema = new mongoose.Schema(
 {
     location: { type:String, required:true, trim:true },
     location_description: { type:String, required:true, trim:true },
+    coordinates: {
+        latitude: { type:Number, required:true },
+        longitude: { type:Number, required:true },
+        range: { type:Number, required:true },
+    },
     price: { type:Number, required:true },
     price_extra: { type:Number, default:0 },
     fee: { type:Number, default:0 },

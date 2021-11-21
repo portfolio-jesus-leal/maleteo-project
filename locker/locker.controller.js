@@ -1,8 +1,8 @@
 const Locker = require("./locker.model");
 const UserResolver = require("../user/user.resolver");
 const RateResolver = require("../rate/rate.resolver");
-const LockerResolver = require("./locker.resolver");
 const { setError } = require("../_shared/utils/error/error.utils");
+const { isAvailable } = require('../_shared/utils/utils.utils');
 
 //
 // GET all lockers
@@ -66,7 +66,8 @@ const postNewLocker = async (req, res, next) => {
   try {
     const {
       guardian,
-      type,
+      property_type,
+      space_type,
       description,
       location,
       address,
@@ -88,7 +89,8 @@ const postNewLocker = async (req, res, next) => {
 
     const newLocker = new Locker({
       guardian,
-      type,
+      property_type,
+      space_type,
       description,
       location,
       address,
@@ -115,7 +117,8 @@ const updateLockerById = async (req, res, next) => {
     const { id } = req.params;
     const {
       guardian,
-      type,
+      property_type,
+      space_type,
       description,
       location,
       address,
@@ -139,7 +142,8 @@ const updateLockerById = async (req, res, next) => {
       id,
       {
         guardian,
-        type,
+        property_type,
+        space_type,
         description,
         location,
         address,
@@ -192,9 +196,9 @@ const addImageLockerById = async (req, res, next) => {
         const { image } = req.body;
     
         console.log("image->", image);
-        console.log("img_url->", image.img_url);
-        if (!image.img_url) {
-            next(setError(400, "Missing imagen url"));
+
+        if (!image) {
+            next(setError(400, "Field image is required"));
         }
     
         const updateLocker = await Locker.findByIdAndUpdate(
@@ -251,46 +255,68 @@ const removeAvailabilityLockerById = async (req, res, next) => {
     }
 }
 
+//
+// GET a locker by id and check whether it is available in a dates range
+//
 const checkAvailabilityLockerById = async (req, res, next) => {
 
   try {
     const { id } = req.params;
     const { init_date, end_date } = req.body;
 
-    const isAvailable = await LockerResolver.checkAvailabilityLocker(id, init_date, end_date);
-
-    if (isAvailable) {
-      return res.status(200).json({available:true});
-    } else {
-      return res.status(200).json({available:false});
-    }
-
-    /* // Parse dates
-    const initDate = Date.parse(init_date);
-    const endDate = Date.parse(end_date);
-
-    // Check if dates are not valid
-    if (isNaN(initDate) || isNaN(endDate)) {
-       return next(setError(400, "Dates are not valid"));
+    if (!init_date || !end_date) {
+      return next(setError(400, "Fields init_date and end_date are required"));
     }
 
     const lockerDetails = await Locker.findById( id );
+
     if (!lockerDetails) {
       return next(setError(400, "Locker not found"));
     }
 
-    for (const item of lockerDetails.available) {
+    if (isAvailable(lockerDetails.available, init_date, end_date)) {
+      return res.status(200).json({available:true});
+    } else {
+      return res.status(200).json({available:false});
+    }
+    
+  } catch (error) {
+    return next(error);
+  }
+}
 
-      const _from = item.available_from.getTime();
-      const _to = item.available_to.getTime();
+//
+// GET all lockers available in a location, in a range of date 
+// and with capacity enough (pieces)
+//
+const getLockersAvailable = async (req, res, next) => {
+  try {
 
-      console.log(item.available_from, '<', init_date, '/', end_date, '<', item.available_to);
+    const {
+      location,
+      init_date, 
+      end_date,
+      pieces
+    } = req.body;
 
-      if (_from <= initDate && _to >= endDate) {
-        return res.status(200).json({available:true});
+    if (!location || !init_date || !end_date || !pieces) {
+      return next(setError(400, "Invalid parameters"));
+    }
+
+    const lockers = await Locker.find(
+      { location: location, active: true, pieces_max: {$gte: pieces} }
+    );
+
+    const lockersAvailable = [];
+    for (const item of lockers) {
+      if (isAvailable(item.available, init_date, end_date)) {
+        lockersAvailable.push(item);
       }
-    } 
-    return res.status(200).json({available:false}); */
+    }
+    
+    console.log('lockersAvailable->', lockersAvailable);
+
+    return res.status(200).json(lockersAvailable);
     
   } catch (error) {
     return next(error);
@@ -302,6 +328,7 @@ module.exports = {
   getLockerById,
   getLockersByGuardian,
   getLockersByLocation,
+  getLockersAvailable,
   postNewLocker,
   updateLockerById,
   updateLockerStatusById,

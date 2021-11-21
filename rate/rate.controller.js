@@ -22,46 +22,6 @@ const calculatePrice = async (req, res, next) => {
       total_price: result.total_price
     });
 
-    /*
-    // Check input values
-    if (!location || !init_date || !end_date || !pieces) {
-      return next(setError(400, "Invalid parameters"));
-    }
-
-    // Parse dates
-    const initDate = Date.parse(init_date);
-    const endDate = Date.parse(end_date);
-
-    // Check if dates are not valid
-    if (isNaN(initDate) || isNaN(endDate)) {
-      return next(setError(400, "Dates are not valid"));
-    }
-
-    // Calculate number of days
-    const days = Math.ceil((endDate - initDate) / (1000 * 60 * 60 * 24));
-
-    // Find a rate
-    rateDetails = await Rate.findOne({ location: location, active: true });
-
-    if (!rateDetails) {
-      return next(setError(400, "Rate not found"));
-    }
-
-    // Calculate prices
-    const grossPrice =
-      (rateDetails.price + ((days - 1) * rateDetails.price_extra)) * pieces;
-    const taxes = (grossPrice * rateDetails.tax_pct) / 100;
-    const totalPrice = grossPrice + taxes + rateDetails.fee;
-
-    return res.status(200).json({
-      pieces: pieces,
-      days: days,
-      gross_price: grossPrice,
-      taxes: taxes,
-      fee: rateDetails.fee,
-      total_price: totalPrice
-    }); */
-
   } catch (error) {
     return next(error);
   }
@@ -103,26 +63,78 @@ const getAllLocations = async (req, res, next) => {
   console.log("getAllLocations");
 
   try {
-    const locations = await Rate.find(
-      {},
-      { location: 1, location_description: 1, _id: 0 }
+    const listLocations = await Rate.find(
+      { active: true },
+      { 
+        location: 1, 
+        location_description: 1, 
+        price: 1,
+        price_extra: 1,
+        _id: 0 
+      }
     ).sort({ location: 1 });
 
     let previousKey = null;
-    let finalLocations = [];
-    for (const item of locations) {
+    let locations = [];
+    for (const item of listLocations) {
       if (item.location !== previousKey) {
-        finalLocations.push(item);
+        locations.push(item);
         previousKey = item.location;
       }
     }
-    console.log("finalLocations ->", finalLocations);
+    console.log("locations ->", locations);
 
-    return res.status(200).json({ finalLocations });
+    return res.status(200).json({ locations });
   } catch (error) {
     next(error);
   }
 };
+
+const getLocationByCoordinates = async (req, res, next) => {
+  try {
+    const { longitude, latitude } = req.body;
+
+    if (!longitude || !latitude) {
+      return next(setError(400, 'Invalid coordinates'));
+    }
+
+    const listLocations = await Rate.find({ active: true });
+
+    for (const location of listLocations) {
+
+      if (location.coordinates.longitude + location.coordinates.range >= longitude &&
+          location.coordinates.longitude - location.coordinates.range <= longitude &&
+          location.coordinates.latitude + location.coordinates.range >= latitude &&
+          location.coordinates.latitude - location.coordinates.range <= latitude)
+        {
+          return res.status(200).json({ location: location.location });
+        }
+      
+    }
+    return res.status(200).json({ location: null });
+    
+  } catch (error) {
+    return next(error);
+  }
+}
+
+//
+// GET location details
+//
+const getLocationDetails = async (req, res, next) => {
+  try {
+    const { location } = req.params;
+
+    const locationDetails = await Rate.findOne(
+      { location: location },
+      { active: true }
+    );
+    
+    return res.status(200).json();
+  } catch (error) {
+    return next(error);
+  }
+}
 
 //
 // POST - Create a new rate
@@ -134,6 +146,9 @@ const postNewRate = async (req, res, next) => {
     const {
       location,
       location_description,
+      latitude,
+      longitude,
+      range,
       price,
       price_extra,
       fee,
@@ -144,6 +159,11 @@ const postNewRate = async (req, res, next) => {
     const newRate = new Rate({
       location: location.toLowerCase(),
       location_description: location_description,
+      coordinates: { 
+        latitude: latitude,
+        longitude: longitude,
+        range: range
+      },
       price: price,
       price_extra: price_extra,
       fee: fee,
@@ -170,6 +190,9 @@ const updateRateById = async (req, res, next) => {
     const {
       location,
       location_description,
+      latitude,
+      longitude,
+      range,
       price,
       price_extra,
       fee,
@@ -183,6 +206,11 @@ const updateRateById = async (req, res, next) => {
       {
         location: location.toLowerCase(),
         location_description: location_description,
+        coordinates: { 
+          latitude: latitude,
+          longitude: longitude,
+          range: range
+        },
         price: price,
         price_extra: price_extra,
         fee: fee,
@@ -233,6 +261,8 @@ const deleteRateById = async (req, res, next) => {
 module.exports = {
   getAllRates,
   getRateById,
+  getLocationDetails,
+  getLocationByCoordinates,
   calculatePrice,
   getAllLocations,
   postNewRate,

@@ -12,7 +12,9 @@ class RateResolver {
 
   static async findRateByLocation(location) {
     try {
-      return await Rate.findOne({ location: location, active: true });
+      return await Rate.findOne({ 
+        location: location, 
+        active: true });
     } catch (error) {
       throw error;
     }
