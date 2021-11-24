@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 
 const bookingSchema = new mongoose.Schema(
 {
-    user: { type: mongoose.Types.ObjectId, ref: 'Users', required:true, trim:true },
-    guardian: { type: mongoose.Types.ObjectId, ref: 'Users', required:true, trim:true },
+    user: { type: mongoose.Types.ObjectId, ref: 'users', required:true, trim:true },
+    guardian: { type: mongoose.Types.ObjectId, ref: 'users', required:true, trim:true },
     init_date: { type:Date, required:true },
     end_date: { type:Date, required:true },
     pieces: { type:Number, required:true },
-    locker: { type: mongoose.Types.ObjectId, ref: 'Lockers', required:true, trim:true},
-    rate: { type: mongoose.Types.ObjectId, ref: 'Rates', required:true, trim:true},
+    locker: { type: mongoose.Types.ObjectId, ref: 'lockers', required:true, trim:true},
+    rate: { type: mongoose.Types.ObjectId, ref: 'rates', required:true, trim:true},
     price: { type:Number, default:0 },
     review: { type:String },
     review_starts: { type:Number, default:0, max:5 },

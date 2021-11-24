@@ -95,13 +95,14 @@ const getAllLocations = async (req, res, next) => {
 //
 const getLocationByCoordinates = async (req, res, next) => {
   try {
-    const { longitude, latitude } = req.body;
 
-    if (!longitude || !latitude) {
+    const { latitude, longitude } = req.query;
+
+    if (!latitude || !longitude) {
       return next(setError(400, 'Invalid coordinates'));
     }
 
-    const listLocations = await Rate.find({ active: true });
+    const listLocations = await Rate.find({ active: true, coordinates: {$exists:true} });
 
     for (const location of listLocations) {
 

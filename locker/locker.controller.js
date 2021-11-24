@@ -292,13 +292,16 @@ const checkAvailabilityLockerById = async (req, res, next) => {
 //
 const getLockersAvailable = async (req, res, next) => {
   try {
+    console.log('req.body->', req.body);
+    console.log('req.query->', req.query);
+    console.log('req.params->', req.params);
 
     const {
       location,
       init_date, 
       end_date,
       pieces
-    } = req.body;
+    } = req.query;
 
     if (!location || !init_date || !end_date || !pieces) {
       return next(setError(400, "Invalid parameters"));
@@ -306,10 +309,11 @@ const getLockersAvailable = async (req, res, next) => {
 
     const lockers = await Locker.find(
       { location: location, active: true, pieces_max: {$gte: pieces} }
-    );
+    ).populate('guardian');
 
     const lockersAvailable = [];
     for (const item of lockers) {
+      item.guardian.password = null;
       if (isAvailable(item.available, init_date, end_date)) {
         lockersAvailable.push(item);
       }

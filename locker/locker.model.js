@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const lockerSchema = new mongoose.Schema(
 {
-    guardian: { type:mongoose.Types.ObjectId, ref: 'Users', required:true, trim:true },
+    guardian: { type:mongoose.Types.ObjectId, ref: 'users', required:true, trim:true },
     description: { type:String, required:true },
     property_type: { type:String, required:true },
     space_type: { type:String, required:true },
