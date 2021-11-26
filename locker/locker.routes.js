@@ -14,12 +14,12 @@ const {
     checkAvailabilityLockerById,
 } = require("./locker.controller");
 
-lockerRouter.get("/available", getLockersAvailable);
 lockerRouter.get("/available/:id", checkAvailabilityLockerById);
+lockerRouter.get("/available", getLockersAvailable);
 lockerRouter.get("/guardian/:guardian", getLockersByGuardian);
 lockerRouter.get("/location/:location", getLockersByLocation);
-lockerRouter.get("/", getAllLockers);
 lockerRouter.get("/:id", getLockerById);
+lockerRouter.get("/", getAllLockers);
 lockerRouter.post("/", upload.single('image'), postNewLocker);
 lockerRouter.put("/:id", upload.single('image'), updateLockerById);
 lockerRouter.patch("/addimage/:id", upload.single('image'), addImageLockerById);

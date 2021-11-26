@@ -26,7 +26,7 @@ const getLockerById = async (req, res, next) => {
 
   try {
     const { id } = req.params;
-    const locker = await Locker.findById(id);
+    const locker = await Locker.findById(id).populate('guardian');
     return res.status(200).json(locker);
   } catch (error) {
     return next(error);
@@ -292,7 +292,6 @@ const checkAvailabilityLockerById = async (req, res, next) => {
 //
 const getLockersAvailable = async (req, res, next) => {
   try {
-    console.log('req.body->', req.body);
     console.log('req.query->', req.query);
     console.log('req.params->', req.params);
 
@@ -318,8 +317,6 @@ const getLockersAvailable = async (req, res, next) => {
         lockersAvailable.push(item);
       }
     }
-    
-    console.log('lockersAvailable->', lockersAvailable);
 
     return res.status(200).json(lockersAvailable);
     
