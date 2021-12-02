@@ -48,21 +48,24 @@ class RateResolver {
       }
 
       // Calculate prices
-      const grossPrice =
-        (rateDetails.price + ((days - 1) * rateDetails.price_extra)) * pieces;
+      const subtotalPrice = rateDetails.price * pieces;
+      const subtotalPriceExtra = (rateDetails.price_extra * (days - 1)) * pieces;
+      const grossPrice = subtotalPrice + subtotalPriceExtra;
       const taxes = (grossPrice * rateDetails.tax_pct) / 100;
       const totalPrice = grossPrice + taxes + rateDetails.fee;
 
       const result = {
+        rate: rateDetails._id,
+        rate_price: rateDetails.price,
+        rate_price_extra: rateDetails.price_extra,
         pieces: pieces,
         days: days,
+        subtotal_price: subtotalPrice,
+        subtotal_price_extra: subtotalPriceExtra,
         gross_price: grossPrice,
         taxes: taxes,
         fee: rateDetails.fee,
         total_price: totalPrice,
-        rate_price: rateDetails.price,
-        rate_price_extra: rateDetails.price_extra,
-        rate: rateDetails._id,
       }
 
       return result;

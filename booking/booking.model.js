@@ -14,7 +14,7 @@ const bookingSchema = new mongoose.Schema(
     review_starts: { type:Number, default:0, max:5 },
     status: { type:String, 
         required:true, 
-        enum:['open', 'paid', 'cancelled', 'closed'],
+        enum:['open', 'confirmed', 'paid', 'cancelled', 'closed'],
         default: 'open'
     }
 },

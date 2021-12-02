@@ -6,6 +6,8 @@ const chatSchema = new mongoose.Schema(
     to: { type:String, ref: 'users', required:true, trim:true},
     msg: { type:String },
     date: { type:Date, default: Date.now },
+    booking: { type:String, ref: 'bookings'},
+    isConfirmed: { type:Boolean, default:false},
     status: { type:String, 
         enum:['sent', 'received', 'read', 'replied'],
         default: 'sent'

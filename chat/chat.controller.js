@@ -47,6 +47,36 @@ const getChatsByUser = async (req, res, next) => {
 }
 
 //
+// GET chats by user From
+//
+const getChatsFrom = async (req, res, next) => {
+  console.log("getChatsFrom");
+
+  try {
+      const { user } = req.params;
+      const chats = await Chat.find({ from: user }).sort({ date: 1 });
+      return res.status(200).json({ chats });
+  } catch (error) {
+      next(error);
+  }
+}
+
+//
+// GET chats by user To
+//
+const getChatsTo = async (req, res, next) => {
+  console.log("getChatsTo");
+
+  try {
+      const { user } = req.params;
+      const chats = await Chat.find({ to: user }).populate('to').sort({ date: 1 });
+      return res.status(200).json({ chats });
+  } catch (error) {
+      next(error);
+  }
+}
+
+//
 // POST - Create a new chat
 //
 const postNewChat = async (req, res, next) => {
@@ -57,13 +87,29 @@ const postNewChat = async (req, res, next) => {
       from,
       to,
       msg,
+      booking,
     } = req.body;
+
+    if (!req.body.isConfirmed) {
+      isConfirmed = false;
+    } else {
+      isConfirmed = req.body.isConfirmed;
+    }
+
+    if (!req.body.status) {
+      _status = "sent"
+    } else {
+      _status = req.body.status;
+    }
 
     const newChat = new Chat({
       from: from,
       to: to,
       msg: msg,
+      booking: booking,
       date: Date.now(),
+      isConfirmed: isConfirmed,
+      status: _status,
     });
 
     const chatInDB = await newChat.save();
@@ -82,6 +128,24 @@ const updateChatStatusById = async (req, res, next) => {
     const updateChat = await Chat.findByIdAndUpdate(
       id,
       { status: req.body.status },
+      { returnDocument: "after" }
+    );
+
+    return res.status(200).json(updateChat);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+//
+// PATH Update Confirmed status by id
+//
+const updateChatConfirmedById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const updateChat = await Chat.findByIdAndUpdate(
+      id,
+      { isConfirmed: true },
       { returnDocument: "after" }
     );
 
@@ -130,4 +194,7 @@ module.exports = {
   updateChatStatusById,
   updateChatMessageById,
   deleteChatById,
+  updateChatConfirmedById,
+  getChatsFrom,
+  getChatsTo,
 };
