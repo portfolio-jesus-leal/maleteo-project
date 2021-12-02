@@ -7,20 +7,13 @@ const { setError } = require("../_shared/utils/error/error.utils");
 //
 const calculatePrice = async (req, res, next) => {
   console.log("calculatePrice");
+  console.log("req.query->", req.query);
 
   try {
-    const { location, init_date, end_date, pieces } = req.body;
+    const { location, init_date, end_date, pieces } = req.query;
 
     result = await RateResolver.calculatePrice(location, init_date, end_date, pieces);
-
-    return res.status(200).json({
-      pieces: pieces,
-      days: result.days,
-      gross_price: result.gross_price,
-      taxes: result.taxes,
-      fee: result.fee,
-      total_price: result.total_price
-    });
+    return res.status(200).json(result);
 
   } catch (error) {
     return next(error);

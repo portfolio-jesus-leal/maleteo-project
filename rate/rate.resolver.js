@@ -59,7 +59,10 @@ class RateResolver {
         gross_price: grossPrice,
         taxes: taxes,
         fee: rateDetails.fee,
-        total_price: totalPrice
+        total_price: totalPrice,
+        rate_price: rateDetails.price,
+        rate_price_extra: rateDetails.price_extra,
+        rate: rateDetails._id,
       }
 
       return result;

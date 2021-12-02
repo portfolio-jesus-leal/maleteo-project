@@ -63,17 +63,9 @@ const getBookingsByGuardian = async (req, res) => {
 // Function to check that values for others collections related are valid
 //
 
-const checkRelationsDB = (user, guardian, rate, locker) => {
+const checkRelationsDB = (user, locker) => {
   if (!user || !UserResolver.findUserById(user)) {
     return next(setError(400, "User not found"));
-  }
-
-  if (!guardian || !UserResolver.findUserById(guardian)) {
-    return next(setError(400, "Guardian not found"));
-  }
-
-  if (!rate || !RateResolver.findRateById(rate)) {
-    return next(setError(400, "Rate does not exist"));
   }
 
   if (!locker || !LockerResolver.findLockerById(locker)) {
@@ -86,32 +78,32 @@ const checkRelationsDB = (user, guardian, rate, locker) => {
 //
 const postNewBooking = async (req, res, next) => {
   try {
-    const { user, guardian, init_date, end_date, pieces, locker, rate } =
+    const { user, init_date, end_date, pieces, locker } =
       req.body;
       
     // Check references to others collections
-    checkRelationsDB(user, guardian, rate, locker);
+    checkRelationsDB(user, locker);
 
     // Get the locker details
     const lockerDetails = await LockerResolver.findLockerById(locker);
 
     // Check is the locker is available
-    const isAvailable = await LockerResolver.checkAvailabilityLocker(locker, init_date, end_date);
+    const isAvailable = await LockerResolver.checkAvailabilityLockerById(locker, init_date, end_date);
     if (!isAvailable) {
         return next(setError(400, "Locker is not available"));
     };
 
     // Calculate the total price
-    result = await RateResolver.calculatePrice(lockerDetails.location, init_date, end_date, pieces);
+    const result = await RateResolver.calculatePrice(lockerDetails.location, init_date, end_date, pieces);
       
     const newBooking = new Booking({
-      user,
-      guardian,
-      init_date,
-      end_date,
-      pieces,
-      locker,
-      rate,
+      user: user,
+      guardian: lockerDetails.guardian,
+      init_date: init_date,
+      end_date: end_date,
+      pieces: pieces,
+      locker: locker,
+      rate: result.rate,
       price: result.total_price,
     });
 
@@ -132,13 +124,13 @@ const updateBookingById = async (req, res, next) => {
       req.body;
 
     // Check references to others collections
-    checkRelationsDB(user, guardian, rate, locker);
+    checkRelationsDB(user, locker);
 
     // Get the locker details
     const lockerDetails = await LockerResolver.findLockerById(locker);
 
     // Check is the locker is available
-    const isAvailable = await LockerResolver.checkAvailabilityLocker(locker, init_date, end_date);
+    const isAvailable = await LockerResolver.checkAvailabilityLockerById(locker, init_date, end_date);
     if (!isAvailable) {
       return next(setError(400, "Locker is not available"));
     };
