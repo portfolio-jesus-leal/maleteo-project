@@ -309,13 +309,20 @@ const getLockersAvailable = async (req, res, next) => {
     const lockers = await Locker.find(
       { location: location, active: true, pieces_max: {$gte: pieces} }
     ).populate('guardian');
+    console.log('lockers->', lockers);
 
     const lockersAvailable = [];
     for (const item of lockers) {
-      item.guardian.password = null;
-      if (isAvailable(item.available, init_date, end_date)) {
-        lockersAvailable.push(item);
-      }
+
+      if (!item.guardian) {
+        console.warn('Incoherencia en locker->', item._id);
+      } else {
+        item.guardian.password = null;
+        if (isAvailable(item.available, init_date, end_date)) {
+          lockersAvailable.push(item);
+        }
+      } 
+      
     }
 
     return res.status(200).json(lockersAvailable);

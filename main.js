@@ -45,7 +45,7 @@ app.use(logging);
 app.use('/users', usersRoutes);
 app.use('/rates', ratesRoutes);
 app.use('/chats', chatsRoutes);
-app.use('/bookings', bookingsRoutes);
+app.use('/bookings', [isAuth], bookingsRoutes);
 app.use('/lockers', lockersRoutes);
 
 app.use('*', (req, res, next) => {
@@ -57,6 +57,10 @@ app.use('*', (req, res, next) => {
 
 // Base Error Handler
 app.use((error, req, res, next) => {
+
+    console.log("error->", error);
+    console.log("error.status->", error.status);
+    console.log("error.message->", error.message);
 
     const exception = {
         status: defaults(error.status, 500),

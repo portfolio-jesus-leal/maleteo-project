@@ -24,17 +24,17 @@ userRouter.post("/login", loginUser);
 userRouter.post("/", upload.single('image'), postNewUser);
 
 // Routes secured by isAuth
-userRouter.get("/", getAllUsers);
-userRouter.get("/:id", getUserById);
-userRouter.put("/:id", upload.single('image'), updateUserById);
-userRouter.post("/logout", logoutUser);
-userRouter.patch("/image/:id", upload.single('image'), updateImageUser);
-userRouter.patch("/address/:id", updateUserAddressById);
-userRouter.patch("/status/:id", setUserStatusById);
-userRouter.patch("/guardian/:id", setUserAsGuardianById);
-userRouter.patch("/search/:id", addSearchUserById);
-userRouter.patch("/marketing/:id", setMarketingUserById);
-userRouter.patch("/password/:id",updateUserPasswordById);
-userRouter.delete("/:id", deleteUserById);
+userRouter.get("/", [isAuth], getAllUsers);
+userRouter.get("/:id", [isAuth], getUserById);
+userRouter.put("/:id", [isAuth], upload.single('image'), updateUserById);
+userRouter.post("/logout", [isAuth], logoutUser);
+userRouter.patch("/image/:id", [isAuth], upload.single('image'), updateImageUser);
+userRouter.patch("/address/:id", [isAuth], updateUserAddressById);
+userRouter.patch("/status/:id", [isAuth], setUserStatusById);
+userRouter.patch("/guardian/:id", [isAuth], setUserAsGuardianById);
+userRouter.patch("/search/:id", [isAuth], addSearchUserById);
+userRouter.patch("/marketing/:id", [isAuth], setMarketingUserById);
+userRouter.patch("/password/:id", [isAuth],updateUserPasswordById);
+userRouter.delete("/:id", [isAuth], deleteUserById);
 
 module.exports = userRouter;

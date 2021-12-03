@@ -108,7 +108,7 @@ const getLocationByCoordinates = async (req, res, next) => {
         }
       
     }
-    return res.status(200).json({ location: null });
+    return res.status(404).json({ location: null });
     
   } catch (error) {
     return next(error);
